@@ -1,0 +1,6 @@
+import { Route, Routes } from 'react-router-dom'
+import { Navbar, Toast } from './ui'
+import { Chat, Dashboard, Discover, EventDetail, Events, Home, JamFeed, Leaderboard, Notifications, Saved, Soon } from './pages'
+import { CommunityChat, Communities, CreatorSpace, HostedEventsDashboard, HostJam, ProfilePage } from './features'
+import { SettingsPage } from './settings'
+export default function App() { return <><Navbar /><Routes><Route path="/" element={<Home />} /><Route path="/discover" element={<Discover />} /><Route path="/jam-feed" element={<JamFeed />} /><Route path="/creator-space" element={<CreatorSpace />} /><Route path="/host-jam" element={<HostJam />} /><Route path="/events" element={<Events />} /><Route path="/events/:id" element={<EventDetail />} /><Route path="/leaderboard" element={<Leaderboard />} /><Route path="/saved" element={<Saved />} /><Route path="/chat" element={<Chat />} /><Route path="/community-chat/:conversationId" element={<CommunityChat />} /><Route path="/communities" element={<Communities />} /><Route path="/profile" element={<ProfilePage />} /><Route path="/settings" element={<SettingsPage />} /><Route path="/notifications" element={<Notifications />} /><Route path="/dashboard" element={<><Dashboard /><HostedEventsDashboard /></>} /><Route path="*" element={<Soon />} /></Routes><Toast /></> }
