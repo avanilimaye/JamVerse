@@ -6,3 +6,7 @@ Frontend-only prototype (React + TypeScript + Vite + Tailwind v4 + Lucide). No b
 /, /discover, /jam-feed, /creator-space, /events (list + map), /events/:id, /host-jam, /communities, /community-chat/:conversationId, /profile, /settings, /leaderboard, /saved, /chat, /notifications, /dashboard
 ## Not built yet (route to a placeholder)
 Search, auth/onboarding, online jam, sponsorship, role switcher.
+
+
+VERCEL LINK:
+https://jam-verse-two.vercel.app
