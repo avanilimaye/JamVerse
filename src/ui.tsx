@@ -36,7 +36,7 @@ function MoreMenu({ variant, items }: { variant: 'desktop' | 'mobile'; items: Na
 }
 export const Navbar = () => {
     const unread = useNotifications().filter(n => !n.read).length; const profile = useProfile(); return <header className="sticky top-0 z-40 border-b border-line bg-bg/90 backdrop-blur"><nav aria-label="Main" className="mx-auto flex max-w-7xl items-center gap-2 px-3 py-3 sm:gap-4 sm:px-4 lg:gap-5">
-        <Link to="/" className="flex items-center gap-2 text-lg font-bold tracking-tight"><span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-gradient text-accent-fg"><Music2 size={18} /></span>JAMVERSE</Link>
+        <Link to="/" className="flex items-center gap-2.5 text-lg font-bold tracking-tight"><img src="/images/logo/jamverse_logo.png" alt="JamVerse logo" className="h-8 w-8 rounded-lg object-contain shadow-sm" />JAMVERSE</Link>
         <div className="hidden min-w-0 flex-1 items-center gap-1 md:flex">{primary.map(([to, l, Icon]) => <NavLink key={to} to={to} end={to === '/'} title={l} className={({ isActive }) => 'inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm transition ' + (isActive ? 'nav-link-active text-fg' : 'text-muted hover:text-fg')}><Icon size={15} aria-hidden="true" /><span className="sr-only lg:not-sr-only">{l}</span></NavLink>)}<MoreMenu variant="desktop" items={more} /></div>
         <Link to="/search" aria-label="Search" title="Search" className="ml-auto text-muted hover:text-fg"><Search size={20} /></Link>
         <Link to="/chat" aria-label="Messages" title="Messages" className="text-muted hover:text-fg"><MessageCircle size={20} /></Link>
