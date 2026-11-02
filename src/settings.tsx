@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { AudioLines, BookOpen, Check, Eye, LogOut, Mic, Minus, Palette, Plus, Settings as SettingsIcon, Type, UserRound, Volume2 } from 'lucide-react'
-import { selectTheme, useTheme, type ThemeId } from './store'
+import { Link, useNavigate } from 'react-router-dom'
+import { AudioLines, BookOpen, Check, Eye, LogIn, LogOut, Mic, Minus, Palette, Plus, Settings as SettingsIcon, Type, UserPlus, UserRound, Volume2 } from 'lucide-react'
+import { selectTheme, useTheme, useAuth, logoutUser, type ThemeId } from './store'
 
 type ReadingFont = 'Default' | 'Atkinson Hyperlegible' | 'Lexend'
 
@@ -47,6 +48,8 @@ function SettingSwitch({ id, label, description, checked, onChange }: { id: stri
 export function SettingsPage() {
     const [textScale, setTextScale] = useState(1)
     const theme = useTheme()
+    const auth = useAuth()
+    const navigate = useNavigate()
     const [screenReader, setScreenReader] = useState(false)
     const [readingFont, setReadingFont] = useState<ReadingFont>('Default')
     const [soundCues, setSoundCues] = useState(true)
@@ -56,6 +59,11 @@ export function SettingsPage() {
     const [voicePreview, setVoicePreview] = useState(false)
     const [speechSpeed, setSpeechSpeed] = useState(1)
     const fonts = Object.keys(fontStacks) as ReadingFont[]
+
+    const handleLogout = () => {
+        logoutUser()
+        navigate('/register')
+    }
 
     return <main className="settings-page mx-auto max-w-7xl px-4 py-7 sm:py-9" style={{ fontSize: `${textScale}em`, fontFamily: fontStacks[readingFont] }}>
         <header className="mb-6 flex flex-wrap items-end justify-between gap-3 sm:mb-8">
@@ -119,9 +127,67 @@ export function SettingsPage() {
                 <div className="mt-4"><div className="mb-2 flex items-center justify-between gap-2"><label htmlFor="speech-speed" className="text-[0.84em] font-semibold">Speech speed</label><output htmlFor="speech-speed" className="text-[0.78em] tabular-nums text-muted">{speechSpeed.toFixed(1)}×</output></div><input id="speech-speed" type="range" min="0.5" max="2" step="0.1" value={speechSpeed} onChange={event => setSpeechSpeed(Number(event.target.value))} className="h-2 w-full cursor-pointer [accent-color:var(--accent)]" /></div>
             </SectionCard>
 
-            <SectionCard icon={UserRound} title="Account" helper="Demo account details for this preview." className="xl:col-span-1">
-                <div className="flex items-center gap-3 rounded-lg border border-line bg-bg p-3"><span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-accent text-accent-fg"><UserRound size={21} aria-hidden="true" /></span><div className="min-w-0"><p className="truncate text-[0.96em] font-bold">Demo Listener</p><p className="truncate text-[0.78em] text-muted">demo.listener@jamverse.app</p></div></div>
-                <button type="button" className="mt-4 inline-flex items-center gap-2 rounded-lg border border-line px-3 py-2 text-[0.84em] font-semibold text-muted transition hover:border-error hover:text-error focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-highlight"><LogOut size={16} aria-hidden="true" />Log out</button>
+            <SectionCard icon={UserRound} title="Account" helper="Authentication and profile state." className="xl:col-span-1">
+                {auth?.isLoggedIn ? (
+                    <div>
+                        <div className="flex items-center gap-3 rounded-lg border border-line bg-bg p-3">
+                            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-accent text-2xl text-accent-fg">
+                                {auth.avatar}
+                            </span>
+                            <div className="min-w-0">
+                                <p className="truncate text-[0.96em] font-bold">{auth.name}</p>
+                                <p className="truncate text-[0.78em] text-muted">{auth.email}</p>
+                                <span className="mt-1 inline-block rounded-full bg-accent/15 px-2 py-0.5 text-[0.7em] font-semibold text-highlight">
+                                    {auth.userType}
+                                </span>
+                            </div>
+                        </div>
+                        <div className="mt-4 flex items-center gap-2">
+                            <Link
+                                to="/profile"
+                                className="inline-flex items-center gap-1.5 rounded-lg border border-line px-3 py-2 text-[0.84em] font-semibold text-fg transition hover:border-accent"
+                            >
+                                Edit Profile
+                            </Link>
+                            <button
+                                type="button"
+                                onClick={handleLogout}
+                                className="inline-flex items-center gap-1.5 rounded-lg border border-line px-3 py-2 text-[0.84em] font-semibold text-muted transition hover:border-error hover:text-error focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-highlight"
+                            >
+                                <LogOut size={16} aria-hidden="true" />
+                                Log out
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <div>
+                        <div className="flex items-center gap-3 rounded-lg border border-line bg-bg p-3">
+                            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-muted/20 text-accent">
+                                <UserRound size={21} aria-hidden="true" />
+                            </span>
+                            <div className="min-w-0">
+                                <p className="truncate text-[0.96em] font-bold">Guest Musician</p>
+                                <p className="truncate text-[0.78em] text-muted">Sign in to save jams & sync profiles</p>
+                            </div>
+                        </div>
+                        <div className="mt-4 flex items-center gap-2">
+                            <Link
+                                to="/login"
+                                className="inline-flex items-center gap-1.5 rounded-lg border border-line px-3 py-2 text-[0.84em] font-semibold text-fg transition hover:border-accent"
+                            >
+                                <LogIn size={15} />
+                                Log in
+                            </Link>
+                            <Link
+                                to="/register"
+                                className="inline-flex items-center gap-1.5 rounded-lg bg-brand-gradient px-3 py-2 text-[0.84em] font-bold text-accent-fg transition hover:brightness-110"
+                            >
+                                <UserPlus size={15} />
+                                Register
+                            </Link>
+                        </div>
+                    </div>
+                )}
             </SectionCard>
         </div>
     </main>

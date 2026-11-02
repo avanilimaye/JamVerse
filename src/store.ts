@@ -103,6 +103,125 @@ export const saveProfile = (nextProfile: ProfileSettings) => {
     profile = nextProfile
     localStorage.setItem(profileKey, JSON.stringify(profile)); emit()
 }
+
+export type UserTypeOption =
+    | 'Music Enthusiast / Music Lover'
+    | 'Singer / Vocalist'
+    | 'Instrumentalist'
+    | 'College Student'
+    | 'Independent Artist'
+    | 'Event Organizer'
+    | 'Café / Venue Owner'
+
+export type AuthUser = {
+    name: string
+    email: string
+    userType: UserTypeOption
+    avatar: string
+    city?: string
+    instrument?: string
+    genre?: string
+    college?: string
+    venueName?: string
+    isLoggedIn: boolean
+}
+
+const authKey = 'jamverse-auth-user'
+let currentUser: AuthUser | null = JSON.parse(localStorage.getItem(authKey) || 'null')
+
+export const useAuth = () => useSyncExternalStore(sub, () => currentUser)
+
+export const registerUser = (data: {
+    name: string
+    email: string
+    userType: UserTypeOption
+    instrument?: string
+    genre?: string
+    college?: string
+    venueName?: string
+    city?: string
+}): boolean => {
+    const avatarMap: Record<UserTypeOption, string> = {
+        'Music Enthusiast / Music Lover': '🎧',
+        'Singer / Vocalist': '🎤',
+        'Instrumentalist': '🎸',
+        'College Student': '🎓',
+        'Independent Artist': '🎹',
+        'Event Organizer': '🎪',
+        'Café / Venue Owner': '☕',
+    }
+    const avatar = avatarMap[data.userType] || '🎵'
+    currentUser = {
+        name: data.name.trim(),
+        email: data.email.trim().toLowerCase(),
+        userType: data.userType,
+        avatar,
+        city: data.city?.trim() || 'Pune',
+        instrument: data.instrument?.trim(),
+        genre: data.genre?.trim(),
+        college: data.college?.trim(),
+        venueName: data.venueName?.trim(),
+        isLoggedIn: true,
+    }
+    localStorage.setItem(authKey, JSON.stringify(currentUser))
+    saveProfile({
+        displayName: currentUser.name,
+        city: currentUser.city || 'Pune',
+        bio: `${currentUser.userType} from ${currentUser.city || 'Pune'}. Jamming on JamVerse!`,
+        avatar,
+    })
+    emit()
+    say(`Welcome to JamVerse, ${currentUser.name}!`)
+    return true
+}
+
+export const loginUser = (email: string, _password?: string): boolean => {
+    const trimmedEmail = email.trim().toLowerCase()
+    const storedAuth: AuthUser | null = JSON.parse(localStorage.getItem(authKey) || 'null')
+
+    if (storedAuth && storedAuth.email.toLowerCase() === trimmedEmail) {
+        currentUser = { ...storedAuth, isLoggedIn: true }
+        localStorage.setItem(authKey, JSON.stringify(currentUser))
+        saveProfile({
+            displayName: currentUser.name,
+            city: currentUser.city || 'Pune',
+            bio: `${currentUser.userType} from ${currentUser.city || 'Pune'}.`,
+            avatar: currentUser.avatar || '🎧',
+        })
+        emit()
+        say(`Welcome back, ${currentUser.name}!`)
+        return true
+    }
+
+    const namePart = trimmedEmail.split('@')[0] || 'Music Fan'
+    const formattedName = namePart.charAt(0).toUpperCase() + namePart.slice(1).replace(/[-_.]/g, ' ')
+    currentUser = {
+        name: formattedName,
+        email: trimmedEmail,
+        userType: 'Music Enthusiast / Music Lover',
+        avatar: '🎧',
+        city: 'Pune',
+        isLoggedIn: true,
+    }
+    localStorage.setItem(authKey, JSON.stringify(currentUser))
+    saveProfile({
+        displayName: formattedName,
+        city: 'Pune',
+        bio: 'Music Enthusiast / Music Lover from Pune.',
+        avatar: '🎧',
+    })
+    emit()
+    say(`Welcome back, ${formattedName}!`)
+    return true
+}
+
+export const logoutUser = () => {
+    currentUser = null
+    localStorage.removeItem(authKey)
+    emit()
+    say('You have been signed out.')
+}
+
 const createdEventsKey = 'jamverse-created-events'
 const restoredEvents = JSON.parse(localStorage.getItem(createdEventsKey) || '[]') as Ev[]
 seededEvents.push(...restoredEvents)
